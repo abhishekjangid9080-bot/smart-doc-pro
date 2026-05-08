@@ -1,167 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartDoc Pro | Ultimate Exam Photo Editor</title>
     
+    <title>SmartDoc Pro | Rajasthan Exam Photo Resizer & AI Studio</title>
+    <meta name="description" content="Rajasthan CET, LDC, REET aur RAS exams ke liye photo resizer. AI se photo ki size (KB) kam karein aur signature crop karein. 100% Free and Secure.">
+    <meta name="keywords" content="Photo Resizer, Rajasthan CET Photo Size, LDC Exam Image Converter, Signature Crop, KB Kam Karne Wala App, Rajasthan Govt Jobs Photo Tool">
+    <meta name="author" content="SmartDoc Pro">
+    
+    <link rel="icon" type="image/png" href="icon.png?v=2">
+    <link rel="apple-touch-icon" href="icon.png?v=2">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         .btn-gradient { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); }
         .logo-box { background: linear-gradient(45deg, #2563eb, #7c3aed); position: relative; overflow: hidden; }
-        .logo-box::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: rgba(255,255,255,0.2); transform: rotate(45deg); animation: shine 3s infinite; }
-        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
-        #cropper-container { max-height: 500px; background: #000; border-radius: 1.5rem; overflow: hidden; width: 100%; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .logo-box::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: rgba(255,255,255,0.1); transform: rotate(45deg); animation: shine 3s infinite; }
+        @keyframes shine { 0% { left: -50%; } 100% { left: 150%; } }
     </style>
 </head>
+<body class="pb-24">
 
-<body class="bg-[#f8fafc] min-h-screen text-slate-900 overflow-x-hidden">
-
-    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+    <div class="p-6 max-w-md mx-auto">
+        <div class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 logo-box rounded-xl flex items-center justify-center shadow-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3" stroke-width="2.5"></circle></svg>
+                <div class="w-12 h-12 rounded-2xl logo-box flex items-center justify-center text-white shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 </div>
                 <div>
-                    <span class="block font-black text-xl tracking-tighter">Smart<span class="text-blue-600">Doc</span></span>
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">AI Studio Pro</span>
+                    <h1 class="text-xl font-black text-slate-800 leading-tight">SmartDoc Pro</h1>
+                    <p class="text-[10px] font-bold text-blue-600 tracking-widest uppercase">AI Exam Studio</p>
                 </div>
             </div>
-            <button id="installBtn" class="hidden text-[10px] font-black uppercase tracking-tighter bg-slate-900 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">Install App</button>
+            <button id="installBtn" class="hidden bg-white shadow-md p-3 rounded-2xl text-blue-600 font-bold text-xs border border-blue-50">INSTALL</button>
         </div>
-    </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-8 lg:py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-            
-            <div class="lg:col-span-8 space-y-8">
-                <div class="bg-white rounded-[2.5rem] shadow-xl p-6 md:p-10 border border-white">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                        <div>
-                            <h2 class="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight">Image Studio</h2>
-                            <p class="text-slate-400 font-semibold italic">Edit & Enhance photos for Rajasthan State Exams.</p>
-                        </div>
-                        <label for="fileInput" class="btn-gradient text-white px-10 py-5 rounded-2xl font-bold cursor-pointer shadow-lg hover:scale-105 transition-all text-center">
-                            Upload Photo
-                        </label>
-                        <input type="file" id="fileInput" accept="image/*" class="hidden">
-                    </div>
-
-                    <div id="editorUI" class="hidden space-y-8">
-                        <div id="cropper-container">
-                            <img id="imageToEdit" class="max-w-full">
-                        </div>
-
-                        <div class="bg-slate-900 rounded-[2rem] p-6 lg:p-8 text-white shadow-2xl">
-                            <h3 class="font-bold uppercase tracking-widest text-xs mb-6 text-blue-400">AI Enhancement Tools</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div>
-                                    <label class="block text-[10px] font-black uppercase text-slate-400 mb-3">Brightness (Saaf Karein)</label>
-                                    <input type="range" id="brightness" min="50" max="150" value="100" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" oninput="applyFilters()">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-black uppercase text-slate-400 mb-3">Contrast (Sharpness)</label>
-                                    <input type="range" id="contrast" min="50" max="150" value="100" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" oninput="applyFilters()">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-black uppercase text-slate-400 mb-3">Saturate (Color)</label>
-                                    <input type="range" id="saturate" min="0" max="200" value="100" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" oninput="applyFilters()">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap gap-4">
-                            <button onclick="cropper.setAspectRatio(1)" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold text-xs hover:bg-blue-600 hover:text-white transition">Square (1:1)</button>
-                            <button onclick="cropper.setAspectRatio(3.5/4.5)" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold text-xs hover:bg-blue-600 hover:text-white transition">Passport (3.5x4.5)</button>
-                            <button onclick="cropper.rotate(90)" class="px-8 py-4 bg-slate-100 rounded-2xl font-bold text-xs hover:bg-slate-900 hover:text-white transition">Rotate</button>
-                        </div>
-
-                        <div class="bg-blue-50 p-6 lg:p-8 rounded-[2rem] border-2 border-blue-100">
-                            <div class="flex justify-between mb-4 items-center">
-                                <span class="font-black text-blue-900 text-sm uppercase">Target Size Limit</span>
-                                <span class="text-blue-600 font-black px-5 py-1 bg-white rounded-full shadow-sm text-lg" id="sizeLabel">50 KB</span>
-                            </div>
-                            <input type="range" id="sizeRange" min="10" max="250" value="50" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer" oninput="updateSizeLabel(this.value)">
-                        </div>
-
-                        <button onclick="processFinal()" class="w-full py-6 btn-gradient text-white font-black text-xl rounded-[1.5rem] shadow-xl hover:brightness-110 active:scale-95 transition-all">
-                            Finalize & Download
-                        </button>
-                    </div>
-
-                    <div id="placeholder" class="py-24 text-center border-4 border-dashed border-slate-100 rounded-[3rem]">
-                        <div class="text-6xl mb-6">📸</div>
-                        <p class="text-slate-400 font-extrabold text-xl tracking-tight">Upload Image to Start Editing</p>
-                    </div>
+        <div class="space-y-4">
+            <div onclick="document.getElementById('fileInput').click()" class="bg-white p-8 rounded-[40px] shadow-sm border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-4 active:scale-95 transition-all">
+                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                 </div>
+                <div class="text-center">
+                    <p class="font-black text-slate-800">Upload Document</p>
+                    <p class="text-xs text-slate-400 font-semibold">Support JPG, PNG up to 10MB</p>
+                </div>
+            </div>
+            <input type="file" id="fileInput" class="hidden" accept="image/*">
 
-                <div id="resultCard" class="hidden bg-slate-900 rounded-[3rem] p-8 text-white shadow-2xl">
-                    <div class="flex justify-between items-center mb-8">
-                        <span class="text-[10px] font-black tracking-widest text-slate-500 uppercase font-bold tracking-widest">Enhanced Result</span>
-                        <span id="finalSize" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-black"></span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img id="finalPreview" class="max-h-[500px] rounded-2xl shadow-2xl mb-8 border-4 border-white/10">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                            <a id="downloadLink" class="bg-white text-slate-900 text-center py-5 rounded-3xl font-black text-lg hover:bg-blue-100 transition shadow-xl">DOWNLOAD IMAGE</a>
-                            <button onclick="saveToVault()" class="bg-white/10 text-white text-center py-5 rounded-3xl font-black text-lg hover:bg-white/20 transition backdrop-blur-md">SAVE TO VAULT</button>
-                        </div>
-                    </div>
+            <div id="editorArea" class="hidden space-y-4 bg-white p-4 rounded-[40px] shadow-sm border border-slate-100">
+                <div class="max-h-64 overflow-hidden rounded-3xl">
+                    <img id="previewImg" class="max-w-full">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="cropImage()" class="btn-gradient text-white py-4 rounded-3xl font-black text-xs shadow-lg shadow-blue-200">CROP & FIX</button>
+                    <button onclick="resetEditor()" class="bg-slate-100 text-slate-600 py-4 rounded-3xl font-black text-xs">CANCEL</button>
                 </div>
             </div>
 
-            <div class="lg:col-span-4 space-y-8">
-                <section class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-white">
-                    <h3 class="font-black text-2xl tracking-tighter mb-8 flex justify-between items-center">
-                        My Vault <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                    </h3>
-                    <div id="vaultList" class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar italic text-slate-300 font-bold text-sm">
-                        Vault khali hai...
+            <div class="mt-8">
+                <h2 class="text-sm font-black text-slate-800 mb-4 px-2">RECENT VAULT</h2>
+                <div id="vaultList" class="space-y-3">
                     </div>
-                </section>
-
-                <section class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden">
-                    <h4 class="font-black text-lg mb-4 relative z-10 italic">Rajasthan Exam Rules</h4>
-                    <p class="text-[11px] opacity-90 font-bold leading-relaxed relative z-10">LDC/CET photos must be 3.5x4.5cm. If the background is dark, increase 'Brightness' to make it clear white.</p>
-                </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer class="bg-white border-t border-slate-100 pt-24 pb-12">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-16">
-            <div class="md:col-span-2 space-y-6 text-center md:text-left">
-                <div class="font-black text-3xl tracking-tighter italic">SmartDoc<span class="text-blue-600">.</span></div>
-                <p class="text-slate-400 text-sm font-semibold max-w-md mx-auto md:mx-0">Premium Document Studio by <strong>CraxPrep</strong>. 100% Secure local processing.</p>
-            </div>
-            <div class="space-y-6 text-center md:text-left">
-                <h5 class="text-xs font-black text-slate-400 tracking-widest uppercase">Quick Links</h5>
-                <ul class="text-slate-800 text-sm font-bold space-y-4">
-                    <li><button onclick="openModal('privacy')" class="hover:text-blue-600">Privacy Policy</button></li>
-                    <li><button onclick="openModal('terms')" class="hover:text-blue-600">Terms of Use</button></li>
-                    <li><button onclick="openModal('about')" class="hover:text-blue-600">Our Mission</button></li>
-                </ul>
-            </div>
-            <div class="bg-slate-50 p-8 rounded-[2.5rem] text-center md:text-left">
-                <h5 class="font-black text-sm italic mb-2">Contact Us</h5>
-                <a href="mailto:support.craxprep@gmail.com" class="text-blue-600 text-xs font-bold underline">support.craxprep@gmail.com</a>
-            </div>
-        </div>
-    </footer>
-
-    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-md z-[100] hidden items-center justify-center p-6">
-        <div class="bg-white rounded-[3rem] max-w-2xl w-full p-10 relative overflow-y-auto max-h-[80vh]">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-300 hover:text-red-500 text-3xl font-black">×</button>
-            <div id="modalContent" class="text-slate-600 text-sm leading-relaxed"></div>
-        </div>
+    <div class="fixed bottom-6 left-6 right-6 bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[32px] p-4 flex justify-around items-center">
+        <button class="text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
+        <button onclick="window.location.reload()" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
+        <button onclick="alert('SmartDoc Pro AI v1.0')" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
     </div>
 
     <script>
@@ -169,92 +84,42 @@
         let db;
         let currentFileName = "";
 
-        const modalData = {
-            privacy: `<h2 class="text-2xl font-black mb-6 tracking-tight">Privacy Policy</h2><p class="mb-4">SmartDoc Pro 100% offline tool hai. Hum aapki photos ya koi bhi personal data kisi server par upload nahi karte. Saara image processing aapke browser ke CPU se hota hai.</p><p>IndexedDB (Vault) aapke apne device ki memory hoti hai, humein iska koi access nahi hota. Aapki security hamari top priority hai.</p>`,
-            terms: `<h2 class="text-2xl font-black mb-6 tracking-tight">Terms & Conditions</h2><p class="mb-4">Is tool ko students ki help ke liye free provide kiya gaya hai. Image compression aur quality ki final check user ko karni hogi. Hum exam form rejection ki zimmedari nahi lete, par humne best tools provide kiye hain standard maintain karne ke liye.</p>`,
-            about: `<h2 class="text-2xl font-black mb-6 tracking-tight">Our Mission</h2><p>CraxPrep ka mission Rajasthan ke har student ko digital tools se empower karna hai taaki wo form bharne jaisi choti problems khud solve kar sakein. SmartDoc isi mission ka ek part hai.</p>`
+        // Database Setup
+        const request = indexedDB.open("SmartDocDB", 1);
+        request.onupgradeneeded = e => {
+            db = e.target.result;
+            db.createObjectStore("vault", { keyPath: "id", autoIncrement: true });
         };
-
-        function openModal(id) { document.getElementById('modalContent').innerHTML = modalData[id]; document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalOverlay').classList.add('flex'); }
-        function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('modalOverlay').classList.remove('flex'); }
-        function updateSizeLabel(v) { document.getElementById('sizeLabel').innerText = v + " KB"; }
-
-        // DB Setup
-        const request = indexedDB.open("SmartDocFinal_DB", 4);
-        request.onupgradeneeded = e => { db = e.target.result; if(!db.objectStoreNames.contains("vault")) db.createObjectStore("vault", { keyPath: "id", autoIncrement: true }); };
         request.onsuccess = e => { db = e.target.result; loadVault(); };
 
-        // File Selection FIX
-        document.getElementById('fileInput').addEventListener('change', function(e) {
+        // File Selection
+        document.getElementById('fileInput').onchange = function(e) {
             const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 5 * 1024 * 1024) return alert("Select under 5MB");
-
-            currentFileName = file.name;
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = document.getElementById('imageToEdit');
-                img.src = event.target.result;
-                document.getElementById('placeholder').classList.add('hidden');
-                document.getElementById('editorUI').classList.remove('hidden');
-                if (cropper) cropper.destroy();
-                cropper = new Cropper(img, { aspectRatio: NaN, viewMode: 1, ready: () => applyFilters() });
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function applyFilters() {
-            if (!cropper) return;
-            const b = document.getElementById('brightness').value;
-            const c = document.getElementById('contrast').value;
-            const s = document.getElementById('saturate').value;
-            const cropperImage = document.querySelector('.cropper-view-box img');
-            const cropperPreview = document.querySelector('.cropper-canvas img');
-            if (cropperImage) cropperImage.style.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
-            if (cropperPreview) cropperPreview.style.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
-        }
-
-        function processFinal() {
-            if (!cropper) return;
-            const canvas = cropper.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
-            const tempCtx = canvas.getContext('2d');
-            
-            // Apply Filters to Final Image
-            const b = document.getElementById('brightness').value;
-            const c = document.getElementById('contrast').value;
-            const s = document.getElementById('saturate').value;
-            
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
-            const ctx = tempCanvas.getContext('2d');
-            ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
-            ctx.drawImage(canvas, 0, 0);
-
-            const targetKb = document.getElementById('sizeRange').value;
-            let quality = 0.9;
-            let dataUrl = tempCanvas.toDataURL('image/jpeg', quality);
-
-            for (let i = 0; i < 7; i++) {
-                const size = (dataUrl.length * 0.75) / 1024;
-                quality += (size > targetKb) ? -0.15 : 0.04;
-                if (quality < 0.05) quality = 0.05;
-                if (quality > 0.98) quality = 0.98;
-                dataUrl = tempCanvas.toDataURL('image/jpeg', quality);
+            if (file) {
+                currentFileName = file.name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.getElementById('previewImg');
+                    img.src = event.target.result;
+                    document.getElementById('editorArea').classList.remove('hidden');
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(img, { aspectRatio: NaN, viewMode: 1 });
+                };
+                reader.readAsDataURL(file);
             }
+        };
 
-            document.getElementById('resultCard').classList.remove('hidden');
-            document.getElementById('finalPreview').src = dataUrl;
-            document.getElementById('finalSize').innerText = Math.round((dataUrl.length * 0.75) / 1024) + " KB";
-            document.getElementById('downloadLink').href = dataUrl;
-            document.getElementById('downloadLink').download = "SmartDoc_" + currentFileName;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        function cropImage() {
+            const canvas = cropper.getCroppedCanvas();
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            saveToVault(dataUrl);
+            resetEditor();
         }
 
-        function saveToVault() {
-            const dataUrl = document.getElementById('finalPreview').src;
+        function saveToVault(dataUrl) {
             const transaction = db.transaction(["vault"], "readwrite");
             transaction.objectStore("vault").add({ name: currentFileName, data: dataUrl, date: new Date().toLocaleDateString() });
-            transaction.oncomplete = () => { alert("Added to Vault!"); loadVault(); };
+            transaction.oncomplete = () => { loadVault(); };
         }
 
         function loadVault() {
@@ -264,13 +129,55 @@
             store.openCursor(null, 'prev').onsuccess = e => {
                 const cursor = e.target.result;
                 if (cursor) {
-                    list.innerHTML += `<div class="bg-slate-50 p-4 rounded-3xl flex justify-between items-center border border-slate-100"><div class="flex items-center gap-3"><img src="${cursor.value.data}" class="w-12 h-12 rounded-xl object-cover"><div><p class="font-black text-[10px] truncate max-w-[80px]">${cursor.value.name}</p></div></div><div class="flex gap-2"><a href="${cursor.value.data}" download="${cursor.value.name}" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[10px] font-black">GET</a><button onclick="deleteDoc(${cursor.value.id})" class="text-slate-300">🗑️</button></div></div>`;
+                    list.innerHTML += `
+                        <div class="bg-white p-4 rounded-3xl flex justify-between items-center border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <img src="${cursor.value.data}" class="w-12 h-12 rounded-xl object-cover">
+                                <div><p class="font-black text-slate-700 text-xs truncate max-w-[100px]">${cursor.value.name}</p></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="${cursor.value.data}" download="smartdoc_${cursor.value.name}" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black">GET</a>
+                                <button onclick="deleteDoc(${cursor.value.id})" class="text-slate-300 ml-2">🗑️</button>
+                            </div>
+                        </div>`;
                     cursor.continue();
                 }
             };
         }
 
-        function deleteDoc(id) { if(confirm("Delete?")) db.transaction(["vault"], "readwrite").objectStore("vault").delete(id).onsuccess = loadVault; }
+        function deleteDoc(id) {
+            db.transaction(["vault"], "readwrite").objectStore("vault").delete(id).onsuccess = () => loadVault();
+        }
+
+        function resetEditor() {
+            document.getElementById('editorArea').classList.add('hidden');
+            document.getElementById('fileInput').value = "";
+        }
+
+        // PWA Install Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').classList.remove('hidden');
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('installBtn').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+        }
     </script>
 </body>
-</html>
+                                                                                                                                                                                                 </html>
+    
