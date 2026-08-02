@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>SmartDoc Pro | Rajasthan Exam Photo Resizer & AI Studio</title>
-    <meta name="description" content="Rajasthan CET, LDC, REET aur RAS exams ke liye photo resizer. AI se photo ki size (KB/MB) kam karein aur signature crop karein. 100% Free and Secure.">
-    <meta name="keywords" content="Photo Resizer, Rajasthan CET Photo Size, LDC Exam Image Converter, Signature Crop, KB MB Converter App, Rajasthan Govt Jobs Photo Tool">
-    <meta name="author" content="SmartDoc Pro">
+    <meta name="description" content="Rajasthan CET, LDC, REET aur RAS exams ke liye photo resizer. AI se photo ki size (KB/MB) kam karein aur signature crop karein.">
     
     <link rel="icon" type="image/png" href="icon.png?v=2">
-    <link rel="apple-touch-icon" href="icon.png?v=2">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Cropper.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <!-- Cropper.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <!-- jsPDF Library for PDF Conversion -->
+    <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -27,11 +26,15 @@
         .logo-box { background: linear-gradient(45deg, #2563eb, #7c3aed); position: relative; overflow: hidden; }
         .logo-box::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: rgba(255,255,255,0.1); transform: rotate(45deg); animation: shine 3s infinite; }
         @keyframes shine { 0% { left: -50%; } 100% { left: 150%; } }
+        /* Cropper Container fix */
+        #imgContainer { width: 100%; max-height: 300px; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #0f172a; border-radius: 1.5rem; }
+        #previewImg { max-width: 100%; display: block; }
     </style>
 </head>
 <body class="pb-24">
 
     <div class="p-6 max-w-md mx-auto">
+        <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-2xl logo-box flex items-center justify-center text-white shadow-lg">
@@ -46,6 +49,7 @@
         </div>
 
         <div class="space-y-4">
+            <!-- Upload Box -->
             <div onclick="document.getElementById('fileInput').click()" class="bg-white p-8 rounded-[40px] shadow-sm border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-4 active:scale-95 transition-all cursor-pointer">
                 <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -57,12 +61,13 @@
             </div>
             <input type="file" id="fileInput" class="hidden" accept="image/*">
 
+            <!-- Editor Area -->
             <div id="editorArea" class="hidden space-y-4 bg-white p-6 rounded-[40px] shadow-sm border border-slate-100">
-                <div class="max-h-64 overflow-hidden rounded-3xl bg-slate-900 flex justify-center">
-                    <img id="previewImg" class="max-w-full" style="filter: brightness(1) contrast(1);">
+                <div id="imgContainer">
+                    <img id="previewImg" alt="Preview">
                 </div>
 
-                <!-- Edit Controls -->
+                <!-- Controls -->
                 <div class="space-y-3 bg-slate-50 p-4 rounded-3xl border border-slate-100">
                     <p class="text-xs font-black text-slate-700">EDIT & ADJUST CONTROLS</p>
                     
@@ -85,12 +90,13 @@
                     <div>
                         <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
                             <span>Target File Size (KB / MB Limit)</span>
-                            <span id="sizeVal">50 KB</span>
+                            <span id="sizeVal">200 KB</span>
                         </div>
-                        <input type="range" id="sizeRange" min="10" max="5120" value="50" class="w-full accent-blue-600" oninput="updateSizeLabel(this.value)">
+                        <input type="range" id="sizeRange" min="50" max="5120" value="200" class="w-full accent-blue-600" oninput="updateSizeLabel(this.value)">
                     </div>
                 </div>
 
+                <!-- Actions -->
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="processAndSaveImage(false)" class="btn-gradient text-white py-4 rounded-3xl font-black text-xs shadow-lg shadow-blue-200">CROP & COMPRESS</button>
                     <button onclick="processAndSaveImage(true)" class="bg-purple-600 text-white py-4 rounded-3xl font-black text-xs shadow-lg shadow-purple-200">CONVERT TO PDF</button>
@@ -98,6 +104,7 @@
                 <button onclick="resetEditor()" class="w-full bg-slate-100 text-slate-600 py-3 rounded-3xl font-black text-xs">CANCEL</button>
             </div>
 
+            <!-- Vault List -->
             <div class="mt-8">
                 <h2 class="text-sm font-black text-slate-800 mb-4 px-2">RECENT VAULT</h2>
                 <div id="vaultList" class="space-y-3"></div>
@@ -105,29 +112,27 @@
         </div>
     </div>
 
-    <div class="fixed bottom-6 left-6 right-6 bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[32px] p-4 flex justify-around items-center">
-        <button class="text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
-        <button onclick="window.location.reload()" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
-        <button onclick="alert('SmartDoc Pro AI v1.3')" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
-    </div>
-
+    <!-- Script Section -->
     <script>
-        let cropper;
-        let db;
+        let cropper = null;
+        let db = null;
         let currentFileName = "";
 
-        // Database Setup
-        const request = indexedDB.open("SmartDocDB", 4);
+        // IndexedDB Initialization
+        const request = indexedDB.open("SmartDocDB", 6);
         request.onupgradeneeded = e => {
             db = e.target.result;
             if(!db.objectStoreNames.contains("vault")) {
                 db.createObjectStore("vault", { keyPath: "id", autoIncrement: true });
             }
         };
-        request.onsuccess = e => { db = e.target.result; loadVault(); };
+        request.onsuccess = e => {
+            db = e.target.result;
+            loadVault();
+        };
 
-        // File Selection
-        document.getElementById('fileInput').onchange = function(e) {
+        // File Selection Listener
+        document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 currentFileName = file.name;
@@ -136,13 +141,20 @@
                     const img = document.getElementById('previewImg');
                     img.src = event.target.result;
                     document.getElementById('editorArea').classList.remove('hidden');
-                    if (cropper) cropper.destroy();
-                    cropper = new Cropper(img, { aspectRatio: NaN, viewMode: 1 });
+                    
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(img, {
+                        aspectRatio: NaN,
+                        viewMode: 1,
+                        autoCropArea: 1
+                    });
                     resetSliders();
                 };
                 reader.readAsDataURL(file);
             }
-        };
+        });
 
         function updateFilters() {
             const b = document.getElementById('brightnessRange').value;
@@ -169,19 +181,22 @@
         function resetSliders() {
             document.getElementById('brightnessRange').value = 100;
             document.getElementById('contrastRange').value = 100;
-            document.getElementById('sizeRange').value = 50;
+            document.getElementById('sizeRange').value = 200;
             document.getElementById('brightVal').innerText = '100%';
             document.getElementById('contrastVal').innerText = '100%';
-            document.getElementById('sizeVal').innerText = '50 KB';
+            document.getElementById('sizeVal').innerText = '200 KB';
         }
 
         function processAndSaveImage(isPdf = false) {
+            if (!cropper) return;
             const canvas = cropper.getCroppedCanvas();
+            if (!canvas) return;
+
             const b = document.getElementById('brightnessRange').value;
             const c = document.getElementById('contrastRange').value;
             const targetKB = parseInt(document.getElementById('sizeRange').value);
 
-            // Apply filter on final canvas rendering
+            // Apply filters onto final canvas
             const finalCanvas = document.createElement('canvas');
             finalCanvas.width = canvas.width;
             finalCanvas.height = canvas.height;
@@ -189,24 +204,30 @@
             ctx.filter = `brightness(${b}%) contrast(${c}%)`;
             ctx.drawImage(canvas, 0, 0);
 
-            // Iterative compression to match target size roughly
-            let quality = 0.9;
+            // Smart Quality & Size Match Loop
+            let quality = 0.95;
             let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
-            
-            let low = 0.05, high = 0.95;
-            for(let i=0; i<5; i++) {
-                quality = (low + high) / 2;
+            let sizeKB = (dataUrl.length * (3/4)) / 1024;
+
+            // Agar original choti hai aur user ne badi size maangi hai, toh quality maintain rakhte hue output generate karein
+            if (sizeKB < targetKB && !isPdf) {
+                quality = 1.0;
                 dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
-                let sizeKB = (dataUrl.length * (3/4)) / 1024;
-                if(sizeKB > targetKB) {
-                    high = quality;
-                } else {
-                    low = quality;
+            } else {
+                let low = 0.1, high = 1.0;
+                for(let i = 0; i < 6; i++) {
+                    quality = (low + high) / 2;
+                    dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+                    sizeKB = (dataUrl.length * (3/4)) / 1024;
+                    if(sizeKB > targetKB) {
+                        high = quality;
+                    } else {
+                        low = quality;
+                    }
                 }
             }
 
             if (isPdf) {
-                // Convert processed image into PDF using jsPDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
                     orientation: finalCanvas.width > finalCanvas.height ? 'l' : 'p',
@@ -219,15 +240,17 @@
                 let baseName = currentFileName.substring(0, currentFileName.lastIndexOf('.')) || 'document';
                 saveToVault(pdfOutput, baseName + '.pdf', 'PDF');
             } else {
-                saveToVault(dataUrl, currentFileName, 'JPG');
+                saveToVault(dataUrl, currentFileName || 'image.jpg', 'JPG');
             }
 
             resetEditor();
         }
 
         function saveToVault(dataUrl, fileName, fileType) {
+            if (!db) return;
             const transaction = db.transaction(["vault"], "readwrite");
-            transaction.objectStore("vault").add({ 
+            const store = transaction.objectStore("vault");
+            store.add({ 
                 name: fileName, 
                 data: dataUrl, 
                 type: fileType,
@@ -237,6 +260,7 @@
         }
 
         function loadVault() {
+            if (!db) return;
             const list = document.getElementById('vaultList');
             list.innerHTML = "";
             const store = db.transaction("vault").objectStore("vault");
@@ -280,7 +304,9 @@
         }
 
         function deleteDoc(id) {
-            db.transaction(["vault"], "readwrite").objectStore("vault").delete(id).onsuccess = () => loadVault();
+            if (!db) return;
+            const transaction = db.transaction(["vault"], "readwrite");
+            transaction.objectStore("vault").delete(id).onsuccess = () => loadVault();
         }
 
         function resetEditor() {
@@ -291,31 +317,7 @@
                 cropper = null;
             }
         }
-
-        // PWA Install Logic
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBtn').classList.remove('hidden');
-        });
-
-        document.getElementById('installBtn').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('installBtn').classList.add('hidden');
-                }
-                deferredPrompt = null;
-            }
-        });
-
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
-        }
     </script>
 </body>
-    </html>
-    
+                </html>
+                
