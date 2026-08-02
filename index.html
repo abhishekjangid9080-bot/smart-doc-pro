@@ -119,7 +119,7 @@
         let currentFileName = "";
 
         // IndexedDB Initialization
-        const request = indexedDB.open("SmartDocDB", 6);
+        const request = indexedDB.open("SmartDocDB", 8);
         request.onupgradeneeded = e => {
             db = e.target.result;
             if(!db.objectStoreNames.contains("vault")) {
@@ -204,42 +204,60 @@
             ctx.filter = `brightness(${b}%) contrast(${c}%)`;
             ctx.drawImage(canvas, 0, 0);
 
-            // Smart Quality & Size Match Loop
-            let quality = 0.95;
-            let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
-            let sizeKB = (dataUrl.length * (3/4)) / 1024;
-
-            // Agar original choti hai aur user ne badi size maangi hai, toh quality maintain rakhte hue output generate karein
-            if (sizeKB < targetKB && !isPdf) {
-                quality = 1.0;
-                dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
-            } else {
-                let low = 0.1, high = 1.0;
-                for(let i = 0; i < 6; i++) {
-                    quality = (low + high) / 2;
-                    dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
-                    sizeKB = (dataUrl.length * (3/4)) / 1024;
-                    if(sizeKB > targetKB) {
-                        high = quality;
-                    } else {
-                        low = quality;
-                    }
-                }
-            }
-
             if (isPdf) {
+                // PDF ke liye image quality high rakhenge aur target size ke mutabiq resolution adjust karenge
+                let targetBytes = targetKB * 1024;
+                let quality = 0.95;
+                let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+                let currentBytes = (dataUrl.length * (3/4));
+
+                // Agar PDF ki size target se kam hai, toh scale factor se image resolution ko badha kar target size achieve karenge
+                let scale = 1.0;
+                if (currentBytes < targetBytes) {
+                    scale = Math.min(4.0, Math.sqrt(targetBytes / currentBytes));
+                }
+
+                const scaledCanvas = document.createElement('canvas');
+                scaledCanvas.width = finalCanvas.width * scale;
+                scaledCanvas.height = finalCanvas.height * scale;
+                const sCtx = scaledCanvas.getContext('2d');
+                sCtx.drawImage(finalCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+                
+                let highResDataUrl = scaledCanvas.toDataURL('image/jpeg', 0.98);
+
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
-                    orientation: finalCanvas.width > finalCanvas.height ? 'l' : 'p',
+                    orientation: scaledCanvas.width > scaledCanvas.height ? 'l' : 'p',
                     unit: 'px',
-                    format: [finalCanvas.width, finalCanvas.height]
+                    format: [scaledCanvas.width, scaledCanvas.height]
                 });
-                pdf.addImage(dataUrl, 'JPEG', 0, 0, finalCanvas.width, finalCanvas.height);
-                const pdfOutput = pdf.output('datauristring');
+                pdf.addImage(highResDataUrl, 'JPEG', 0, 0, scaledCanvas.width, scaledCanvas.height);
                 
+                const pdfOutput = pdf.output('datauristring');
                 let baseName = currentFileName.substring(0, currentFileName.lastIndexOf('.')) || 'document';
                 saveToVault(pdfOutput, baseName + '.pdf', 'PDF');
             } else {
+                // JPG Compression Loop
+                let quality = 0.95;
+                let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+                let sizeKB = (dataUrl.length * (3/4)) / 1024;
+
+                if (sizeKB < targetKB) {
+                    quality = 1.0;
+                    dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+                } else {
+                    let low = 0.1, high = 1.0;
+                    for(let i = 0; i < 6; i++) {
+                        quality = (low + high) / 2;
+                        dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+                        sizeKB = (dataUrl.length * (3/4)) / 1024;
+                        if(sizeKB > targetKB) {
+                            high = quality;
+                        } else {
+                            low = quality;
+                        }
+                    }
+                }
                 saveToVault(dataUrl, currentFileName || 'image.jpg', 'JPG');
             }
 
@@ -319,5 +337,4 @@
         }
     </script>
 </body>
-                </html>
-                
+</html>
