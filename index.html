@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>SmartDoc Pro | Rajasthan Exam Photo Resizer & AI Studio</title>
-    <meta name="description" content="Rajasthan CET, LDC, REET aur RAS exams ke liye photo resizer. AI se photo ki size (KB) kam karein aur signature crop karein. 100% Free and Secure.">
-    <meta name="keywords" content="Photo Resizer, Rajasthan CET Photo Size, LDC Exam Image Converter, Signature Crop, KB Kam Karne Wala App, Rajasthan Govt Jobs Photo Tool">
+    <meta name="description" content="Rajasthan CET, LDC, REET aur RAS exams ke liye photo resizer. AI se photo ki size (KB/MB) kam karein aur signature crop karein. 100% Free and Secure.">
+    <meta name="keywords" content="Photo Resizer, Rajasthan CET Photo Size, LDC Exam Image Converter, Signature Crop, KB MB Converter App, Rajasthan Govt Jobs Photo Tool">
     <meta name="author" content="SmartDoc Pro">
     
     <link rel="icon" type="image/png" href="icon.png?v=2">
@@ -84,10 +84,10 @@
 
                     <div>
                         <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
-                            <span>Target File Size (KB Limit)</span>
-                            <span id="kbVal">50 KB</span>
+                            <span>Target File Size (KB / MB Limit)</span>
+                            <span id="sizeVal">50 KB</span>
                         </div>
-                        <input type="range" id="kbRange" min="10" max="500" value="50" class="w-full accent-blue-600" oninput="document.getElementById('kbVal').innerText = this.value + ' KB'">
+                        <input type="range" id="sizeRange" min="10" max="5120" value="50" class="w-full accent-blue-600" oninput="updateSizeLabel(this.value)">
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@
     <div class="fixed bottom-6 left-6 right-6 bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[32px] p-4 flex justify-around items-center">
         <button class="text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
         <button onclick="window.location.reload()" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
-        <button onclick="alert('SmartDoc Pro AI v1.2')" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+        <button onclick="alert('SmartDoc Pro AI v1.3')" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
     </div>
 
     <script>
@@ -117,7 +117,7 @@
         let currentFileName = "";
 
         // Database Setup
-        const request = indexedDB.open("SmartDocDB", 3);
+        const request = indexedDB.open("SmartDocDB", 4);
         request.onupgradeneeded = e => {
             db = e.target.result;
             if(!db.objectStoreNames.contains("vault")) {
@@ -156,20 +156,30 @@
             }
         }
 
+        function updateSizeLabel(val) {
+            let kb = parseInt(val);
+            if (kb >= 1024) {
+                let mb = (kb / 1024).toFixed(1);
+                document.getElementById('sizeVal').innerText = mb + ' MB';
+            } else {
+                document.getElementById('sizeVal').innerText = kb + ' KB';
+            }
+        }
+
         function resetSliders() {
             document.getElementById('brightnessRange').value = 100;
             document.getElementById('contrastRange').value = 100;
-            document.getElementById('kbRange').value = 50;
+            document.getElementById('sizeRange').value = 50;
             document.getElementById('brightVal').innerText = '100%';
             document.getElementById('contrastVal').innerText = '100%';
-            document.getElementById('kbVal').innerText = '50 KB';
+            document.getElementById('sizeVal').innerText = '50 KB';
         }
 
         function processAndSaveImage(isPdf = false) {
             const canvas = cropper.getCroppedCanvas();
             const b = document.getElementById('brightnessRange').value;
             const c = document.getElementById('contrastRange').value;
-            const targetKB = parseInt(document.getElementById('kbRange').value);
+            const targetKB = parseInt(document.getElementById('sizeRange').value);
 
             // Apply filter on final canvas rendering
             const finalCanvas = document.createElement('canvas');
@@ -179,7 +189,7 @@
             ctx.filter = `brightness(${b}%) contrast(${c}%)`;
             ctx.drawImage(canvas, 0, 0);
 
-            // Iterative compression to match target KB roughly
+            // Iterative compression to match target size roughly
             let quality = 0.9;
             let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
             
@@ -234,7 +244,14 @@
                 const cursor = e.target.result;
                 if (cursor) {
                     let item = cursor.value;
-                    let sizeKB = Math.round((item.data.length * (3/4)) / 1024);
+                    let sizeBytes = (item.data.length * (3/4));
+                    let sizeDisplay = "";
+                    if (sizeBytes >= (1024 * 1024)) {
+                        sizeDisplay = (sizeBytes / (1024 * 1024)).toFixed(1) + ' MB';
+                    } else {
+                        sizeDisplay = Math.round(sizeBytes / 1024) + ' KB';
+                    }
+
                     let fileBadge = item.type === 'PDF' ? 'bg-purple-600' : 'bg-blue-600';
                     let previewThumb = item.type === 'PDF' ? 
                         `<div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-[10px]">PDF</div>` :
@@ -248,7 +265,7 @@
                                     <p class="font-black text-slate-700 text-xs truncate max-w-[110px]">${item.name}</p>
                                     <div class="flex items-center gap-2">
                                         <span class="text-[9px] font-bold px-1.5 py-0.5 rounded text-white ${fileBadge}">${item.type || 'JPG'}</span>
-                                        <span class="text-[10px] font-bold text-slate-400">${sizeKB} KB</span>
+                                        <span class="text-[10px] font-bold text-slate-400">${sizeDisplay}</span>
                                     </div>
                                 </div>
                             </div>
@@ -300,4 +317,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    
