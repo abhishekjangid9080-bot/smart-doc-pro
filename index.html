@@ -119,7 +119,7 @@
         let currentFileName = "";
 
         // IndexedDB Initialization
-        const request = indexedDB.open("SmartDocDB", 8);
+        const request = indexedDB.open("SmartDocDB", 9);
         request.onupgradeneeded = e => {
             db = e.target.result;
             if(!db.objectStoreNames.contains("vault")) {
@@ -205,35 +205,34 @@
             ctx.drawImage(canvas, 0, 0);
 
             if (isPdf) {
-                // PDF ke liye image quality high rakhenge aur target size ke mutabiq resolution adjust karenge
-                let targetBytes = targetKB * 1024;
+                const { jsPDF } = window.jspdf;
                 let quality = 0.95;
                 let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
-                let currentBytes = (dataUrl.length * (3/4));
+                
+                const pdf = new jsPDF({
+                    orientation: finalCanvas.width > finalCanvas.height ? 'l' : 'p',
+                    unit: 'px',
+                    format: [finalCanvas.width, finalCanvas.height]
+                });
+                pdf.addImage(dataUrl, 'JPEG', 0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // PDF Target Size Padding Logic
+                let pdfOutput = pdf.output('datauristring');
+                let targetBytes = targetKB * 1024;
+                let currentBytes = (pdfOutput.length * (3/4));
 
-                // Agar PDF ki size target se kam hai, toh scale factor se image resolution ko badha kar target size achieve karenge
-                let scale = 1.0;
                 if (currentBytes < targetBytes) {
-                    scale = Math.min(4.0, Math.sqrt(targetBytes / currentBytes));
+                    let diff = targetBytes - currentBytes;
+                    // Add dummy metadata comment inside PDF to match exact target file size
+                    let paddingStr = "\n% " + "A".repeat(Math.floor(diff * 0.75)) + " \n";
+                    pdf.internal.events.publish('save');
+                    // Append padding directly to the output binary
+                    let base64Header = pdfOutput.substring(0, pdfOutput.indexOf(',') + 1);
+                    let rawBase64 = pdfOutput.substring(pdfOutput.indexOf(',') + 1);
+                    let binaryStr = atob(rawBase64) + paddingStr;
+                    pdfOutput = base64Header + btoa(binaryStr);
                 }
 
-                const scaledCanvas = document.createElement('canvas');
-                scaledCanvas.width = finalCanvas.width * scale;
-                scaledCanvas.height = finalCanvas.height * scale;
-                const sCtx = scaledCanvas.getContext('2d');
-                sCtx.drawImage(finalCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
-                
-                let highResDataUrl = scaledCanvas.toDataURL('image/jpeg', 0.98);
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: scaledCanvas.width > scaledCanvas.height ? 'l' : 'p',
-                    unit: 'px',
-                    format: [scaledCanvas.width, scaledCanvas.height]
-                });
-                pdf.addImage(highResDataUrl, 'JPEG', 0, 0, scaledCanvas.width, scaledCanvas.height);
-                
-                const pdfOutput = pdf.output('datauristring');
                 let baseName = currentFileName.substring(0, currentFileName.lastIndexOf('.')) || 'document';
                 saveToVault(pdfOutput, baseName + '.pdf', 'PDF');
             } else {
