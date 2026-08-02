@@ -44,31 +44,60 @@
         </div>
 
         <div class="space-y-4">
-            <div onclick="document.getElementById('fileInput').click()" class="bg-white p-8 rounded-[40px] shadow-sm border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-4 active:scale-95 transition-all">
+            <div onclick="document.getElementById('fileInput').click()" class="bg-white p-8 rounded-[40px] shadow-sm border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-4 active:scale-95 transition-all cursor-pointer">
                 <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                 </div>
                 <div class="text-center">
-                    <p class="font-black text-slate-800">Upload Document</p>
+                    <p class="font-black text-slate-800">Upload Document / Photo</p>
                     <p class="text-xs text-slate-400 font-semibold">Support JPG, PNG up to 10MB</p>
                 </div>
             </div>
             <input type="file" id="fileInput" class="hidden" accept="image/*">
 
-            <div id="editorArea" class="hidden space-y-4 bg-white p-4 rounded-[40px] shadow-sm border border-slate-100">
-                <div class="max-h-64 overflow-hidden rounded-3xl">
-                    <img id="previewImg" class="max-w-full">
+            <div id="editorArea" class="hidden space-y-4 bg-white p-6 rounded-[40px] shadow-sm border border-slate-100">
+                <div class="max-h-64 overflow-hidden rounded-3xl bg-slate-900 flex justify-center">
+                    <img id="previewImg" class="max-w-full" style="filter: brightness(1) contrast(1);">
                 </div>
+
+                <!-- Edit Controls -->
+                <div class="space-y-3 bg-slate-50 p-4 rounded-3xl border border-slate-100">
+                    <p class="text-xs font-black text-slate-700">EDIT & ADJUST CONTROLS</p>
+                    
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                            <span>Brightness</span>
+                            <span id="brightVal">100%</span>
+                        </div>
+                        <input type="range" id="brightnessRange" min="50" max="150" value="100" class="w-full accent-blue-600" oninput="updateFilters()">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                            <span>Contrast</span>
+                            <span id="contrastVal">100%</span>
+                        </div>
+                        <input type="range" id="contrastRange" min="50" max="150" value="100" class="w-full accent-blue-600" oninput="updateFilters()">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                            <span>Target File Size (KB Limit)</span>
+                            <span id="kbVal">50 KB</span>
+                        </div>
+                        <input type="range" id="kbRange" min="10" max="500" value="50" class="w-full accent-blue-600" oninput="document.getElementById('kbVal').innerText = this.value + ' KB'">
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="cropImage()" class="btn-gradient text-white py-4 rounded-3xl font-black text-xs shadow-lg shadow-blue-200">CROP & FIX</button>
+                    <button onclick="processAndSaveImage()" class="btn-gradient text-white py-4 rounded-3xl font-black text-xs shadow-lg shadow-blue-200">CROP & COMPRESS</button>
                     <button onclick="resetEditor()" class="bg-slate-100 text-slate-600 py-4 rounded-3xl font-black text-xs">CANCEL</button>
                 </div>
             </div>
 
             <div class="mt-8">
                 <h2 class="text-sm font-black text-slate-800 mb-4 px-2">RECENT VAULT</h2>
-                <div id="vaultList" class="space-y-3">
-                    </div>
+                <div id="vaultList" class="space-y-3"></div>
             </div>
         </div>
     </div>
@@ -76,7 +105,7 @@
     <div class="fixed bottom-6 left-6 right-6 bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[32px] p-4 flex justify-around items-center">
         <button class="text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></button>
         <button onclick="window.location.reload()" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
-        <button onclick="alert('SmartDoc Pro AI v1.0')" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+        <button onclick="alert('SmartDoc Pro AI v1.1')" class="text-slate-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
     </div>
 
     <script>
@@ -85,10 +114,12 @@
         let currentFileName = "";
 
         // Database Setup
-        const request = indexedDB.open("SmartDocDB", 1);
+        const request = indexedDB.open("SmartDocDB", 2);
         request.onupgradeneeded = e => {
             db = e.target.result;
-            db.createObjectStore("vault", { keyPath: "id", autoIncrement: true });
+            if(!db.objectStoreNames.contains("vault")) {
+                db.createObjectStore("vault", { keyPath: "id", autoIncrement: true });
+            }
         };
         request.onsuccess = e => { db = e.target.result; loadVault(); };
 
@@ -104,14 +135,64 @@
                     document.getElementById('editorArea').classList.remove('hidden');
                     if (cropper) cropper.destroy();
                     cropper = new Cropper(img, { aspectRatio: NaN, viewMode: 1 });
+                    resetSliders();
                 };
                 reader.readAsDataURL(file);
             }
         };
 
-        function cropImage() {
+        function updateFilters() {
+            const b = document.getElementById('brightnessRange').value;
+            const c = document.getElementById('contrastRange').value;
+            document.getElementById('brightVal').innerText = b + '%';
+            document.getElementById('contrastVal').innerText = c + '%';
+            
+            const cropperCanvasImg = document.querySelector('.cropper-view-box img, .cropper-canvas img');
+            if(cropperCanvasImg) {
+                cropperCanvasImg.style.filter = `brightness(${b}%) contrast(${c}%)`;
+            }
+        }
+
+        function resetSliders() {
+            document.getElementById('brightnessRange').value = 100;
+            document.getElementById('contrastRange').value = 100;
+            document.getElementById('kbRange').value = 50;
+            document.getElementById('brightVal').innerText = '100%';
+            document.getElementById('contrastVal').innerText = '100%';
+            document.getElementById('kbVal').innerText = '50 KB';
+        }
+
+        function processAndSaveImage() {
             const canvas = cropper.getCroppedCanvas();
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            const b = document.getElementById('brightnessRange').value;
+            const c = document.getElementById('contrastRange').value;
+            const targetKB = parseInt(document.getElementById('kbRange').value);
+
+            // Apply filter on final canvas rendering
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = canvas.width;
+            finalCanvas.height = canvas.height;
+            const ctx = finalCanvas.getContext('2d');
+            ctx.filter = `brightness(${b}%) contrast(${c}%)`;
+            ctx.drawImage(canvas, 0, 0);
+
+            // Iterative compression to match target KB roughly
+            let quality = 0.9;
+            let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+            
+            // Binary search approximation for file size
+            let low = 0.05, high = 0.95;
+            for(let i=0; i<5; i++) {
+                quality = (low + high) / 2;
+                dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+                let sizeKB = (dataUrl.length * (3/4)) / 1024;
+                if(sizeKB > targetKB) {
+                    high = quality;
+                } else {
+                    low = quality;
+                }
+            }
+
             saveToVault(dataUrl);
             resetEditor();
         }
@@ -129,11 +210,15 @@
             store.openCursor(null, 'prev').onsuccess = e => {
                 const cursor = e.target.result;
                 if (cursor) {
+                    let sizeKB = Math.round((cursor.value.data.length * (3/4)) / 1024);
                     list.innerHTML += `
                         <div class="bg-white p-4 rounded-3xl flex justify-between items-center border border-slate-100 shadow-sm">
                             <div class="flex items-center gap-3">
                                 <img src="${cursor.value.data}" class="w-12 h-12 rounded-xl object-cover">
-                                <div><p class="font-black text-slate-700 text-xs truncate max-w-[100px]">${cursor.value.name}</p></div>
+                                <div>
+                                    <p class="font-black text-slate-700 text-xs truncate max-w-[120px]">${cursor.value.name}</p>
+                                    <p class="text-[10px] font-bold text-blue-600">${sizeKB} KB</p>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 <a href="${cursor.value.data}" download="smartdoc_${cursor.value.name}" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black">GET</a>
@@ -152,6 +237,10 @@
         function resetEditor() {
             document.getElementById('editorArea').classList.add('hidden');
             document.getElementById('fileInput').value = "";
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
         }
 
         // PWA Install Logic
@@ -179,5 +268,5 @@
         }
     </script>
 </body>
-                                                                                                                                                                                                 </html>
-    
+                                                                                                                                                        </html>
+                                                                                                                                                        
